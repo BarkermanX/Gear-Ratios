@@ -1,0 +1,15 @@
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/bin/Debug/net7.0/Gear-Ratios
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/bin/Debug/net7.0/Gear-Ratios.deps.json
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/bin/Debug/net7.0/Gear-Ratios.runtimeconfig.json
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/bin/Debug/net7.0/Gear-Ratios.dll
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/bin/Debug/net7.0/Gear-Ratios.pdb
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.csproj.AssemblyReference.cache
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.GeneratedMSBuildEditorConfig.editorconfig
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.AssemblyInfoInputs.cache
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.AssemblyInfo.cs
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.csproj.CoreCompileInputs.cache
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.dll
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/refint/Gear-Ratios.dll
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.pdb
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/Gear-Ratios.genruntimeconfig.cache
+/Users/stevenbarker/Documents/GitHub/Gear-Ratios/Gear-Ratios/Gear-Ratios/obj/Debug/net7.0/ref/Gear-Ratios.dll
