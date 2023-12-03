@@ -1,4 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.RegularExpressions;
@@ -23,6 +23,8 @@ Console.WriteLine("Hello, World!");
 // Specify the path to the text file
 
 int iGearSum = 0;
+Dictionary<string, List<int>> dctMatches = new Dictionary<string, List<int>>();
+
 
 string filePath = "TestData.txt";
 List<string> lstAllLines = new List<string>(); ;
@@ -96,6 +98,9 @@ for(iLineNumber = 0; iLineNumber < dctLineData.Count; iLineNumber++)
 
     List<(string substring, int position)> lstItems = ((LineInfo)dctLineData[iLineNumber]).NumberPositionList;
 
+    lstDistinctSymbols.Clear();
+    lstDistinctSymbols.Add('*');
+
     for (int iItem = 0; iItem < lstItems.Count; iItem++)
     {
         string strNumberString = lstItems[iItem].substring;
@@ -104,39 +109,39 @@ for(iLineNumber = 0; iLineNumber < dctLineData.Count; iLineNumber++)
         bool bResult = false;
 
         // Check left and right
-        bResult = Helper.checkLeft(strLineData, iStringPosition, lstDistinctSymbols);
+        bResult = Helper.checkLeft(strLineData, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         if(!bResult)
-            bResult = Helper.checkRight(strLineData, strNumberString, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.checkRight(strLineData, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         // Above and below first letter
         if (!bResult)
-            bResult = Helper.CheckAboveFirstLetter(strLineAbove, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.CheckAboveFirstLetter(strLineAbove, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         if (!bResult)
-            bResult = Helper.CheckBelowFirstLetter(strLineBelow, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.CheckBelowFirstLetter(strLineBelow, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         // Above and below last letter
         if (!bResult)
-            bResult = Helper.CheckAboveLastNumber(strLineAbove, strNumberString, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.CheckAboveLastNumber(strLineAbove, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         if (!bResult)
-            bResult = Helper.CheckBelowLastNumber(strLineBelow, strNumberString, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.CheckBelowLastNumber(strLineBelow, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         // Diagnol from first letter
         if (!bResult)
-            bResult = Helper.checkDiagnolAboveFirst(strLineAbove, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.checkDiagnolAboveFirst(strLineAbove, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         if (!bResult)
-            bResult = Helper.checkDiagnolBelowFirst(strLineBelow, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.checkDiagnolBelowFirst(strLineBelow, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
 
         // Diagnol from last letter
         if (!bResult)
-            bResult = Helper.CheckDiagnolAboveLast(strLineAbove, strNumberString, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.CheckDiagnolAboveLast(strLineAbove, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         if (!bResult)
-            bResult = Helper.CheckDiagnolBelowLast(strLineBelow, strNumberString, iStringPosition, lstDistinctSymbols);
+            bResult = Helper.CheckDiagnolBelowLast(strLineBelow, strNumberString, iStringPosition, lstDistinctSymbols, dctMatches, iLineNumber);
 
         if (bResult)
         {
@@ -156,16 +161,28 @@ Console.WriteLine(iGearSum);
 string strEND = "END";
 
 
+int iSum2 = 0;
+
+foreach(string strKey in dctMatches.Keys)
+{
+    if (dctMatches[strKey].Count == 2)
+    {
+        int iNumber1 = dctMatches[strKey][0];
+        int iNumber2 = dctMatches[strKey][1];
+
+        int iMultiply = iNumber1 * iNumber2;
+
+        iSum2 = iSum2 + iMultiply;
+    }
+}
+
+Console.WriteLine(iSum2);
+
 
 public static class Helper
 {
-    public static bool symbolBelow()
-    {
-        
-        return false;
-    }
-
-    public static bool checkLeft(string strLine, int iPosition, List<char> lstDistinctSymbols)
+    
+    public static bool checkLeft(string strLine, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         // check character before the string starts
         int iPositionLeft = iPosition - 1;
@@ -177,10 +194,30 @@ public static class Helper
 
         char cCharacterToCheck = strLine[iPositionLeft];
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        bool bValid =  lstDistinctSymbols.Contains(cCharacterToCheck);
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = iLineNumber + "__" + iPositionLeft;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
     }
 
-    public static bool checkRight(string strLine, string strNumberString, int iPosition, List<char> lstDistinctSymbols)
+    public static bool checkRight(string strLine, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         // check character before the string starts
         int iPositionRight = iPosition + strNumberString.Length;
@@ -193,10 +230,30 @@ public static class Helper
         char cCharacterToCheck = strLine[iPositionRight];
 
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = iLineNumber + "__" + iPositionRight;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
     }
 
-    public static bool CheckAboveFirstLetter(string strLineAbove, int iPosition, List<char> lstDistinctSymbols)
+    public static bool CheckAboveFirstLetter(string strLineAbove, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineAbove))
         {
@@ -214,16 +271,35 @@ public static class Helper
 
         if (!bValid)
         {
-            cCharacterToCheck = strLineAbove[iPosition + 1];
+            iPosition = iPosition + 1;
+            cCharacterToCheck = strLineAbove[iPosition];
 
             bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+        }
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber - 1) + "__" + iPosition;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
         }
 
         return bValid;
 
     }
 
-    public static bool CheckBelowFirstLetter(string strLineBelow, int iPosition, List<char> lstDistinctSymbols)
+    public static bool CheckBelowFirstLetter(string strLineBelow, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineBelow))
         {
@@ -236,20 +312,38 @@ public static class Helper
         }
 
         char cCharacterToCheck = strLineBelow[iPosition];
-
         bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
 
         if (!bValid)
         {
-            cCharacterToCheck = strLineBelow[iPosition + 1];
+            iPosition = iPosition + 1;
+            cCharacterToCheck = strLineBelow[iPosition];
 
             bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+        }
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber + 1) + "__" + iPosition;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
         }
 
         return bValid;
     }
 
-    public static bool CheckAboveLastNumber(string strLineAbove, string strNumberString, int iPosition, List<char> lstDistinctSymbols)
+    public static bool CheckAboveLastNumber(string strLineAbove, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineAbove))
         {
@@ -265,10 +359,30 @@ public static class Helper
         }
         char cCharacterToCheck = strLineAbove[iPositionToTest];
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber - 1) + "__" + iPositionToTest;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
     }
 
-    public static bool CheckBelowLastNumber(string strLineBelow, string strNumberString, int iPosition, List<char> lstDistinctSymbols)
+    public static bool CheckBelowLastNumber(string strLineBelow, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineBelow))
         {
@@ -284,10 +398,30 @@ public static class Helper
         }
         char cCharacterToCheck = strLineBelow[iPositionToTest];
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber + 1) + "__" + iPositionToTest;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
     }
 
-    public static bool checkDiagnolAboveFirst(string strLineAbove, int iPosition, List<char> lstDistinctSymbols)
+    public static bool checkDiagnolAboveFirst(string strLineAbove, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineAbove))
         {
@@ -303,11 +437,30 @@ public static class Helper
         }
 
         char cCharacterToCheck = strLineAbove[iPositionToTest];
+        bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber - 1) + "__" + iPositionToTest;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
     }
 
-    public static bool checkDiagnolBelowFirst(string strLineBelow, int iPosition, List<char> lstDistinctSymbols)
+    public static bool checkDiagnolBelowFirst(string strLineBelow, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineBelow))
         {
@@ -323,10 +476,30 @@ public static class Helper
         }
         char cCharacterToCheck = strLineBelow[iPositionToTest];
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber + 1) + "__" + iPositionToTest;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
     }
 
-    public static bool CheckDiagnolAboveLast(string strLineAbove, string strNumberString, int iPosition, List<char> lstDistinctSymbols)
+    public static bool CheckDiagnolAboveLast(string strLineAbove, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineAbove))
         {
@@ -342,11 +515,31 @@ public static class Helper
         }
         char cCharacterToCheck = strLineAbove[iPositionToTest];
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber - 1) + "__" + iPositionToTest;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
 
     }
 
-    public static bool CheckDiagnolBelowLast(string strLineBelow, string strNumberString, int iPosition, List<char> lstDistinctSymbols)
+    public static bool CheckDiagnolBelowLast(string strLineBelow, string strNumberString, int iPosition, List<char> lstDistinctSymbols, Dictionary<string, List<int>> dctMatches, int iLineNumber)
     {
         if (string.IsNullOrEmpty(strLineBelow))
         {
@@ -362,7 +555,27 @@ public static class Helper
         }
         char cCharacterToCheck = strLineBelow[iPositionToTest];
 
-        return lstDistinctSymbols.Contains(cCharacterToCheck);
+        bool bValid = lstDistinctSymbols.Contains(cCharacterToCheck);
+
+        if (bValid)
+        {
+            int iValidNumber = int.Parse(strNumberString);
+            string strStarKey = (iLineNumber + 1) + "__" + iPositionToTest;
+
+            if (dctMatches.ContainsKey(strStarKey))
+            {
+                dctMatches[strStarKey].Add(iValidNumber);
+            }
+            else
+            {
+                List<int> lstNewList = new List<int>();
+                lstNewList.Add(iValidNumber);
+
+                dctMatches.Add(strStarKey, lstNewList);
+            }
+        }
+
+        return bValid;
 
     }
 
